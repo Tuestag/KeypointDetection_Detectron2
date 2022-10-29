@@ -7,6 +7,7 @@ from detectron2.config import get_cfg
 from detectron2.data import MetadataCatalog
 from detectron2.utils.visualizer import ColorMode, Visualizer
 from detectron2 import model_zoo
+from detectron2.data.datasets import register_coco_instances
 from PIL import Image 
 import PIL 
 import cv2
@@ -25,6 +26,10 @@ class Detector:
         self.cfg.MODEL.WEIGHTS = os.path.join("https://github.com/Tuestag/DetectionADASStream/releases/download/adasdetectronCO/Detectron2.pth")
         self.cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.7
         self.cfg.MODEL.DEVICE = "cpu" # cpu or cuda
+        
+        register_coco_instances("my_dataset_test", {}, "/test/_annotations.coco.json", "test")
+        MetadataCatalog.get("my_dataset_test").thing_classes = ['Adas', 'Moto', 'Obstaculo', 'Peaton', 'Pista', 'Vehiculo']
+        MetadataCatalog.get("my_dataset_test").thing_dataset_id_to_contiguous_id = {0: 0, 1: 1, 2: 2, 3: 3, 4: 4, 5:5}
 
         self.predictor = DefaultPredictor(self.cfg)
 
@@ -32,7 +37,7 @@ class Detector:
         image = cv2.imread(imagePath)
         predictions = self.predictor(image)
 
-        viz = Visualizer(image[:,:,::-1],metadata= MetadataCatalog.get(self.cfg.DATASETS.TRAIN[0]),scale=1.2)#instance_mode=ColorMode.IMAGE_BW)
+        viz = Visualizer(image[:,:,::-1],MetadataCatalog.get("my_dataset_test"),scale=1.2)#instance_mode=ColorMode.IMAGE_BW)
         
         output = viz.draw_instance_predictions(predictions['instances'].to('cpu'))
         filename = 'result.jpg'
@@ -57,7 +62,7 @@ class Detector:
         video_writer = cv2.VideoWriter("output.mp4", fourcc , fps=float(frames_per_second), frameSize=(width, height), isColor=True)
 
        
-        v = VideoVisualizer(MetadataCatalog.get(self.cfg.DATASETS.TRAIN[0]), ColorMode.IMAGE)
+        v = VideoVisualizer(MetadataCatalog.get("my_dataset_test"), ColorMode.IMAGE)
 
         def runOnVideo(video,maxFrames):# this is for debugging
 
