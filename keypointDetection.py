@@ -18,7 +18,11 @@ import os
 
 
 class Detector:
-
+    
+    register_coco_instances("my_dataset_test", {}, "/test/_annotations.coco.json", "test")
+    MetadataCatalog.get("my_dataset_test").thing_classes = ['Adas', 'Moto', 'Obstaculo', 'Peaton', 'Pista', 'Vehiculo']
+    MetadataCatalog.get("my_dataset_test").thing_dataset_id_to_contiguous_id = {0: 0, 1: 1, 2: 2, 3: 3, 4: 4, 5:5}
+        
     def __init__(self, model_type = 'keypointsDetection'):
         self.cfg = get_cfg()
         self.cfg.MODEL.ROI_HEADS.NUM_CLASSES = 5
@@ -27,9 +31,7 @@ class Detector:
         self.cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.7
         self.cfg.MODEL.DEVICE = "cpu" # cpu or cuda
         
-        register_coco_instances("my_dataset_test", {}, "/test/_annotations.coco.json", "test")
-        MetadataCatalog.get("my_dataset_test").thing_classes = ['Adas', 'Moto', 'Obstaculo', 'Peaton', 'Pista', 'Vehiculo']
-        MetadataCatalog.get("my_dataset_test").thing_dataset_id_to_contiguous_id = {0: 0, 1: 1, 2: 2, 3: 3, 4: 4, 5:5}
+
 
         self.predictor = DefaultPredictor(self.cfg)
 
