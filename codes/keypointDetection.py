@@ -12,6 +12,7 @@ import PIL
 import cv2
 import numpy as np
 import tqdm
+import os
 
 
 
@@ -19,8 +20,9 @@ class Detector:
 
     def __init__(self, model_type = 'keypointsDetection'):
         self.cfg = get_cfg()
-        self.cfg.merge_from_file(model_zoo.get_config_file("COCO-Keypoints/keypoint_rcnn_R_50_FPN_3x.yaml"))
-        self.cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url("COCO-Keypoints/keypoint_rcnn_R_50_FPN_3x.yaml")
+        self.cfg.MODEL.ROI_HEADS.NUM_CLASSES = 5
+        self.cfg.merge_from_file(model_zoo.get_config_file("COCO-Detection/faster_rcnn_R_50_FPN_1x.yaml"))
+        self.cfg.MODEL.WEIGHTS = os.path.join("https://github.com/Tuestag/DetectionADASStream/releases/download/adasdetectronCO/Detectron2.pth")
         self.cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.7
         self.cfg.MODEL.DEVICE = "cpu" # cpu or cuda
 
